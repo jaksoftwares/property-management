@@ -11,12 +11,7 @@ import { RevenueChart } from '@/components/dashboard/revenue-chart';
 import { apartmentStorage, unitStorage, tenantStorage, paymentStorage } from '@/lib/storage';
 
 export default function Reports() {
-  const [reportData, setReportData] = useState<{
-    apartments: any[];
-    units: any[];
-    tenants: any[];
-    payments: any[];
-  }>({
+  const [reportData, setReportData] = useState({
     apartments: [],
     units: [],
     tenants: [],

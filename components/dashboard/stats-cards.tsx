@@ -17,30 +17,21 @@ interface StatsCardsProps {
   };
 }
 
-type CardType = {
-  title: string;
-  value: string;
-  icon: React.ElementType;
-  subtitle?: string;
-  change?: string;
-  changeType?: 'positive' | 'warning' | 'negative';
-};
-
 export function StatsCards({ stats }: StatsCardsProps) {
-  const cards: CardType[] = [
+  const cards = [
     {
       title: 'Total Revenue',
       value: `KSh ${stats.monthlyRevenue.toLocaleString()}`,
       icon: DollarSign,
       change: '+12.3%',
-      changeType: 'positive',
+      changeType: 'positive' as const,
     },
     {
       title: 'Occupancy Rate',
       value: `${stats.occupancyRate.toFixed(1)}%`,
       icon: TrendingUp,
       change: '+2.1%',
-      changeType: 'positive',
+      changeType: 'positive' as const,
     },
     {
       title: 'Total Units',
@@ -65,7 +56,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
       value: stats.maintenanceUnits.toString(),
       icon: AlertTriangle,
       subtitle: 'Units under maintenance',
-      changeType: 'warning',
+      changeType: 'warning' as const,
     },
   ];
 
