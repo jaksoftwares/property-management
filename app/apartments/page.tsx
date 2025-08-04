@@ -6,11 +6,15 @@ import { Sidebar } from '@/components/layout/sidebar';
 import { Header } from '@/components/layout/header';
 import { Button } from '@/components/ui/button';
 import { ApartmentCard } from '@/components/apartments/apartment-card';
+import { ApartmentWorkspace } from '@/components/apartments/apartment-workspace';
+import { AddApartmentForm } from '@/components/apartments/add-apartment-form';
 import { apartmentStorage, unitStorage } from '@/lib/storage';
 
 export default function Apartments() {
   const [apartments, setApartments] = useState<any[]>([]);
   const [units, setUnits] = useState<any[]>([]);
+  const [selectedApartment, setSelectedApartment] = useState<any>(null);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   useEffect(() => {
     setApartments(apartmentStorage.getAll());
@@ -26,20 +30,94 @@ export default function Apartments() {
     };
   };
 
+  const handleAddApartment = (apartmentData: any) => {
+    const newApartment = apartmentStorage.add({
+      ...apartmentData,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    });
+    setApartments(apartmentStorage.getAll());
+    setShowAddForm(false);
+  };
+
   const handleEdit = (id: string) => {
-    console.log('Edit apartment:', id);
+    const apartment = apartments.find(apt => apt.id === id);
+    if (apartment) {
+      setSelectedApartment(apartment);
+    }
   };
 
   const handleDelete = (id: string) => {
     if (confirm('Are you sure you want to delete this apartment?')) {
       apartmentStorage.delete(id);
       setApartments(apartmentStorage.getAll());
+      if (selectedApartment?.id === id) {
+        setSelectedApartment(null);
+      }
     }
   };
 
   const handleViewUnits = (id: string) => {
-    console.log('View units for apartment:', id);
+    const apartment = apartments.find(apt => apt.id === id);
+    if (apartment) {
+      setSelectedApartment(apartment);
+    }
   };
+
+  const handleUpdateApartment = (updatedApartment: any) => {
+    apartmentStorage.update(updatedApartment.id, updatedApartment);
+    setApartments(apartmentStorage.getAll());
+    setSelectedApartment(updatedApartment);
+  };
+
+  const handleBackToList = () => {
+    setSelectedApartment(null);
+    // Refresh data when returning to list
+    setApartments(apartmentStorage.getAll());
+    setUnits(unitStorage.getAll());
+  };
+
+  if (showAddForm) {
+    return (
+      <div className="flex h-screen bg-gray-50">
+        <Sidebar />
+        <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
+          <Header 
+            title="Add Apartment" 
+            subtitle="Create a new apartment property"
+          />
+          <main className="flex-1 overflow-y-auto p-6">
+            <AddApartmentForm
+              onSave={handleAddApartment}
+              onCancel={() => setShowAddForm(false)}
+            />
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  if (selectedApartment) {
+    return (
+      <div className="flex h-screen bg-gray-50">
+        <Sidebar />
+        <div className="flex-1 flex flex-col overflow-hidden lg:ml-0">
+          <Header 
+            title="Apartment Management" 
+            subtitle="Manage units and apartment details"
+          />
+          <main className="flex-1 overflow-y-auto p-6">
+            <ApartmentWorkspace
+              apartment={selectedApartment}
+              onBack={handleBackToList}
+              onUpdate={handleUpdateApartment}
+              onDelete={handleDelete}
+            />
+          </main>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -58,7 +136,7 @@ export default function Apartments() {
                 {apartments.length} apartments, {units.length} total units
               </p>
             </div>
-            <Button>
+            <Button onClick={() => setShowAddForm(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Add Apartment
             </Button>
@@ -74,7 +152,7 @@ export default function Apartments() {
               <h3 className="mt-2 text-sm font-medium text-gray-900">No apartments</h3>
               <p className="mt-1 text-sm text-gray-500">Get started by adding your first apartment.</p>
               <div className="mt-6">
-                <Button>
+                <Button onClick={() => setShowAddForm(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Apartment
                 </Button>
