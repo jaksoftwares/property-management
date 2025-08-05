@@ -1,5 +1,6 @@
 import { apartmentStorage, unitStorage, tenantStorage, paymentStorage, maintenanceStorage } from './storage';
 import { seedTenantData } from './tenant-data-seeding';
+import { seedAdminData } from './admin-data-seeding';
 
 export function seedSampleData() {
   // Check if data already exists
@@ -7,6 +8,9 @@ export function seedSampleData() {
   
   // Seed tenant portal data
   seedTenantData();
+  
+  // Seed admin data
+  seedAdminData();
 
   // Sample apartments
   const apartments = [
